@@ -3,38 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Add Food Item</title>
-    <link rel="stylesheet" href="form.css">
+    <title>Home - Food Menu</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="admin-form">
-        <form>
-            <div class="logo">
-                <img src="assets/logo.png" alt="Hotel Logo">
-            </div>
+    <nav class="navbar">
+        <div class="logo"><img src="assets/logo.png"></div>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Category</a>
+                <div class="dropdown-content">
+                    <a href="#">Starter</a>
+                    <a href="#">Main Course</a>
+                    <a href="#">Dessert</a>
+                    <a href="#">Beverage</a>
+                </div>
+            </li>
+        </ul>
+        <a href="admin.html">
+            <button type="button">Admin</button>
+        </a>
+    </nav>
 
-            <h1>Add Food Item</h1>
-            
-            <label for="food-name">Food Name:</label>
-            <input type="text" id="food-name" name="food-name" placeholder="Enter food name" required>
+    <section class="food-container" id="food-container">
+        <!-- Food items will be dynamically inserted here -->
+    </section>
 
-            <label for="category">Category:</label>
-            <select id="category" name="category" required>
-                <option value="">Select Category</option>
-                <option value="starter">Starter</option>
-                <option value="main-course">Main Course</option>
-                <option value="dessert">Dessert</option>
-                <option value="beverage">Beverage</option>
-            </select>
+    <script>
+        // Fetch food items from the server and display them in card format
+        async function loadFoodItems() {
+            try {
+                const response = await fetch("/api/foods");
+                const foodItems = await response.json();
+                const container = document.getElementById("food-container");
 
-            <label for="price">Price:</label>
-            <input type="number" id="price" name="price" placeholder="Enter price" required>
+                // Generate cards dynamically
+                container.innerHTML = foodItems.map(item => `
+                    <div class="food-card">
+                        <h3>${item.food_name}</h3>
+                        <p><strong>Category:</strong> ${item.category}</p>
+                        <p><strong>Price:</strong> $${item.price}</p>
+                        <p><strong>Description:</strong> ${item.description || "No description available."}</p>
+                    </div>
+                `).join("");
+            } catch (error) {
+                console.error("Error loading food items:", error);
+                const container = document.getElementById("food-container");
+                container.innerHTML = "<p>Error loading food items. Please try again later.</p>";
+            }
+        }
 
-            <label for="description">Description:</label>
-            <textarea id="description" name="description" rows="4" placeholder="Enter food description"></textarea>
-
-            <button type="submit">Add Food Item</button>
-        </form>
-    </div>
+        loadFoodItems(); 
+    </script>
 </body>
 </html>

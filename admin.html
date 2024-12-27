@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Add Food Item</title>
+    <link rel="stylesheet" href="form.css">
+</head>
+<body>
+    <div class="admin-form">
+        <form id="food-add-form" action="/admin" method="post">
+            <div class="logo">
+                <img src="assets/logo.png" alt="Hotel Logo">
+            </div>
+
+            <h1>Add Food Item</h1>
+            
+            <label for="food_name">Food Name:</label>
+            <input type="text" id="food_name" name="food_name" placeholder="Enter food name" required>
+
+            <label for="category">Category:</label>
+            <select id="category" name="category" required>
+                <option value="">Select Category</option>
+                <option value="starter">Starter</option>
+                <option value="main-course">Main Course</option>
+                <option value="dessert">Dessert</option>
+                <option value="beverage">Beverage</option>
+            </select>
+
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" placeholder="Enter price" required>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4" placeholder="Enter food description"></textarea>
+
+            <button type="submit">Add Food Item</button>
+        </form>
+    </div>
+
+    <script src="server.js"></script>
+</body>
+</html>
