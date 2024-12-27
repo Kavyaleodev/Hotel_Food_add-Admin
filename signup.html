@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Signup</title>
+    <link rel="stylesheet" href="form.css">
+</head>
+<body>
+    <div class="admin-form">
+        <form id="signup-form">
+            <h1>Admin Signup</h1>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter password" required>
+
+            <button type="submit">Signup</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('signup-form').addEventListener('submit', function(event){
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if(username === 'admin' && password === 'admin123') {
+                localStorage.setItem('isAdmin', true);
+                alert('Signup successful. You can now add food items.');
+                window.location.href = 'admin.html';  // Redirect to admin page
+            } else {
+                alert('Incorrect username or password!');
+            }
+        });
+    </script>
+</body>
+</html>

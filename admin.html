@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="form.css">
 </head>
 <body>
+    <script>
+        // Ensure only admins who have signed up can access this page
+        if (!localStorage.getItem('isAdmin')) {
+            alert('You must sign up first!');
+            window.location.href = 'signup.html';  // Redirect to signup page
+        }
+    </script>
+    
     <div class="admin-form">
         <form id="food-add-form" action="/admin" method="post">
             <div class="logo">
