@@ -28,7 +28,7 @@
             const password = document.getElementById('password').value;
 
             if(username === 'admin' && password === 'admin123') {
-                localStorage.setItem('isAdmin', true);
+                localStorage.setItem('isAdmin', 'true');
                 alert('Signup successful. You can now add food items.');
                 window.location.href = 'admin.html';  // Redirect to admin page
             } else {

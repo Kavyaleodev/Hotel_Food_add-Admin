@@ -16,14 +16,18 @@ async function loadFoodItems() {
 // Display food items in the container
 function displayFoodItems(foodItems) {
     const container = document.getElementById("food-container");
-    container.innerHTML = foodItems.map(item => `
-        <div class="food-card">
-            <h3>${item.food_name}</h3>
-            <p><strong>Category:</strong> ${item.category}</p>
-            <p><strong>Price:</strong> $${item.price}</p>
-            <p><strong>Description:</strong> ${item.description || "No description available."}</p>
-        </div>
-    `).join("");
+    container.innerHTML = foodItems.map(item => {
+        console.log("Food Item:", item);  // Check if image URL exists
+        return `
+            <div class="food-card">
+                <h3>${item.food_name}</h3>
+                <p><strong>Category:</strong> ${item.category}</p>
+                <p><strong>Price:</strong> $${item.price}</p>
+                <p><strong>Description:</strong> ${item.description || "No description available."}</p>
+                ${item.image ? `<img src="${item.image}" alt="${item.food_name}" class="food-image">` : ""}
+            </div>
+        `;
+    }).join("");
 }
 
 // Filter food items based on search query and selected category

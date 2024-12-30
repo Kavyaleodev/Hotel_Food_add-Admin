@@ -16,10 +16,7 @@
     </script>
     
     <div class="admin-form">
-        <form id="food-add-form" action="/admin" method="post">
-            <div class="logo">
-                <img src="assets/logo.png" alt="Hotel Logo">
-            </div>
+        <form id="food-add-form" action="/admin" method="post" enctype="multipart/form-data">
 
             <h1>Add Food Item</h1>
             
@@ -40,6 +37,9 @@
 
             <label for="description">Description:</label>
             <textarea id="description" name="description" rows="4" placeholder="Enter food description"></textarea>
+
+            <label for="image">Image:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
 
             <button type="submit">Add Food Item</button>
         </form>
