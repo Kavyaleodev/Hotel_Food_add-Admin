@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .form-container {
+            background-color: rgb(216, 215, 215);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 30px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            margin: 10px 0 5px;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="tel"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .form-container input[type="text"]:disabled,
+        .form-container input[type="number"]:disabled {
+            background-color: #f2f2f2;
+        }
+
+        input[type="number"]:invalid {
+            border-color: red;
+        }
+
+        input[type="number"]:valid {
+            border-color: green;
+        }
+
+        /* Additional styling for the total price */
+        #totalPrice {
+            font-weight: bold;
+            color: #2e8b57;
+        }
+    </style>
+</head>
+<body>
+    <center><h1>Order Food</h1></center>
+    <div class="form-container">
+        <form action="/order" method="POST">
+            <label for="foodName">Food Name:</label>
+            <input type="text" id="foodName" name="food_name" readonly>
+
+            <label for="price">Price (per unit):</label>
+            <input type="text" id="price" name="price" readonly>
+
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" min="1" required>
+
+            <label for="totalPrice">Total Price:</label>
+            <input type="text" id="totalPrice" name="total_price" readonly>
+
+            <label for="customerName">Customer Name:</label>
+            <input type="text" id="customerName" name="customer_name" required>
+
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" required></textarea>
+
+            <label for="landmark">Landmark:</label>
+            <input type="text" id="landmark" name="landmark">
+
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city" required>
+
+            <label for="state">State:</label>
+            <input type="text" id="state" name="state" required>
+
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" name="phone" required>
+
+            <button type="submit">Order Now</button>
+        </form>
+    </div>
+
+    <script>
+        // Auto-fill the food name and price fields from the query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const foodName = urlParams.get('foodName');
+        const price = parseFloat(urlParams.get('price'));
+
+        if (foodName) {
+            document.getElementById('foodName').value = decodeURIComponent(foodName);
+        }
+
+        if (!isNaN(price)) {
+            document.getElementById('price').value = price.toFixed(2);
+        }
+
+        // Calculate total price dynamically based on quantity
+        const quantityInput = document.getElementById('quantity');
+        const totalPriceInput = document.getElementById('totalPrice');
+
+        quantityInput.addEventListener('input', () => {
+            const quantity = parseInt(quantityInput.value, 10);
+            if (!isNaN(quantity) && quantity > 0) {
+                totalPriceInput.value = (price * quantity).toFixed(2);
+            } else {
+                totalPriceInput.value = "";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -14,10 +14,15 @@ async function loadFoodItems() {
 }
 
 // Display food items in the container
+// Function to redirect to the order page with food name and price
+function orderNow(foodName, price) {
+    window.location.href = `order.html?foodName=${encodeURIComponent(foodName)}&price=${price}`;
+}
+
+// Display food items with updated "Order Now" button
 function displayFoodItems(foodItems) {
     const container = document.getElementById("food-container");
     container.innerHTML = foodItems.map(item => {
-        console.log("Food Item:", item);  // Check if image URL exists
         return `
             <div class="food-card">
                 <h3>${item.food_name}</h3>
@@ -25,6 +30,7 @@ function displayFoodItems(foodItems) {
                 <p><strong>Price:</strong> $${item.price}</p>
                 <p><strong>Description:</strong> ${item.description || "No description available."}</p>
                 ${item.image ? `<img src="${item.image}" alt="${item.food_name}" class="food-image">` : ""}
+                <button onclick="orderNow('${item.food_name}', ${item.price})">Order Now</button>
             </div>
         `;
     }).join("");

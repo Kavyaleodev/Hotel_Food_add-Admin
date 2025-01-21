@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Add Food Item</title>
     <link rel="stylesheet" href="form.css">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+<link rel="stylesheet" href="css/all.min.css">
+
 </head>
 <body>
     <script>
@@ -14,7 +17,15 @@
             window.location.href = 'signup.html';  // Redirect to signup page
         }
     </script>
-    
+    <nav class="navbar">
+        <div class="logo"><img src="assets/logo.png" alt="Food Logo"></div>
+        <h1 style="font-size: 30px;">Ritz Foods</h1>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+    </ul>
+    </nav>
     <div class="admin-form">
         <form id="food-add-form" action="/admin" method="post" enctype="multipart/form-data">
 
@@ -44,6 +55,20 @@
             <button type="submit">Add Food Item</button>
         </form>
     </div>
+    <!-- Footer Section -->
+<footer class="footer">
+    <div class="footer-content">
+        <h2>Ritz Carlton</h2>
+        <div class="social-links">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        </div>
+    </div>
+    <hr>
+    <p class="footer-rights">All rights are reserved © 2025</p>
+</footer>
 
     <script src="server.js"></script>
 </body>
