@@ -3,6 +3,32 @@ body {
     background-color: #f0f0f0;
     padding: 20px;
 }
+.logo img {
+    width: 60px;
+    height: 60px;
+    border-radius: 80%;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1rem;
+    background-color: #333;
+    color: white;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    font-size: 20px;
+}
 
 .admin-form {
     max-width: 500px;
