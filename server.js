@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require("express"); 
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const multer = require("multer");
@@ -49,6 +49,21 @@ const contactSchema = new mongoose.Schema({
 });
 const Contact = mongoose.model("contacts", contactSchema);
 
+// Order Schema
+const orderSchema = new mongoose.Schema({
+  food_name: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  customer_name: { type: String, required: true },
+  address: { type: String, required: true },
+  landmark: { type: String },
+  city: { type: String, required: true },
+  state: { type: String, required: true },
+  phone: { type: String, required: true },
+  status: { type: String, default: "Pending" },
+}, { timestamps: true }); // Automatically adds createdAt and updatedAt fields
+
+const Order = mongoose.model("orders", orderSchema);
+
 // Serve the homepage
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
@@ -64,6 +79,11 @@ app.get("/about", (req, res) => {
   res.sendFile(__dirname + "/about.html");
 });
 
+// Serve the view orders page
+app.get("/vieworders", (req, res) => {
+  res.sendFile(__dirname + "/vieworders.html");
+});
+
 // API to get all food items
 app.get("/api/foods", async (req, res) => {
   try {
@@ -75,7 +95,18 @@ app.get("/api/foods", async (req, res) => {
   }
 });
 
-// Admin form submission
+// API to get all orders
+app.get("/api/orders", async (req, res) => {
+  try {
+    const orders = await Order.find();
+    res.json(orders);
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+    res.status(500).send("Error fetching orders.");
+  }
+});
+
+// Admin form submission for adding food
 app.post("/admin", upload.single("image"), async (req, res) => {
   try {
     const { food_name, category, price, description } = req.body;
@@ -95,45 +126,6 @@ app.post("/admin", upload.single("image"), async (req, res) => {
     console.error("Error saving food item:", err);
     res.status(500).send("Error saving food item. Please try again later.");
   }
-});
-
-// Contact form submission
-app.post("/contact", async (req, res) => {
-  try {
-    const { issue, full_name, email, mobile, message } = req.body;
-
-    const newContact = new Contact({
-      issue,
-      full_name,
-      email,
-      mobile,
-      message,
-    });
-
-    await newContact.save();
-    res.send("Thank you for your feedback! <a href='/'>Go back</a>");
-  } catch (err) {
-    console.error("Error saving contact form:", err);
-    res.status(500).send("Error saving contact form. Please try again later.");
-  }
-});
-
-// Order Schema
-const orderSchema = new mongoose.Schema({
-  food_name: { type: String, required: true },
-  quantity: { type: Number, required: true },
-  customer_name: { type: String, required: true },
-  address: { type: String, required: true },
-  landmark: { type: String },
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  phone: { type: String, required: true },
-});
-const Order = mongoose.model("orders", orderSchema);
-
-// Serve the order page
-app.get("/order", (req, res) => {
-  res.sendFile(__dirname + "/order.html");
 });
 
 // Handle order form submissions
@@ -162,6 +154,48 @@ app.post("/order", async (req, res) => {
 
 // Serve static files for images
 app.use("/uploads", express.static("uploads"));
+
+// API to delete a food item by ID
+app.delete("/api/foods/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Food.findByIdAndDelete(id);
+    res.send("Food item deleted successfully.");
+  } catch (err) {
+    console.error("Error deleting food item:", err);
+    res.status(500).send("Error deleting food item.");
+  }
+});
+
+// API to fetch a food item by ID (for editing)
+app.get("/api/foods/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const foodItem = await Food.findById(id);
+    res.json(foodItem);
+  } catch (err) {
+    console.error("Error fetching food item:", err);
+    res.status(500).send("Error fetching food item.");
+  }
+});
+
+// API to update a food item by ID
+app.put("/api/foods/:id", upload.single("image"), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { food_name, category, price, description } = req.body;
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+    const updatedData = { food_name, category, price, description };
+    if (imageUrl) updatedData.image = imageUrl;
+
+    await Food.findByIdAndUpdate(id, updatedData, { new: true });
+    res.send("Food item updated successfully.");
+  } catch (err) {
+    console.error("Error updating food item:", err);
+    res.status(500).send("Error updating food item.");
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

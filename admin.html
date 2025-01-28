@@ -6,31 +6,181 @@
     <title>Admin - Add Food Item</title>
     <link rel="stylesheet" href="form.css">
     <link rel="stylesheet" href="css/fontawesome.min.css">
-<link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="css/all.min.css">
+    <style>
+        /* General styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
+        /* Navbar styles */
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #ff6600;
+            color: white;
+            padding: 10px 0px 0px 10px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 24px;
+            text-align: center;
+            padding-bottom: 70px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 20px;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+        }
+
+        /* Form styling */
+        .admin-form {
+            margin-left: 470px;
+            padding: 20px;
+            max-width: 600px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .admin-form h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .admin-form label {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .admin-form input,
+        .admin-form select,
+        .admin-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .admin-form button {
+            background-color: #ff6600;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .admin-form button:hover {
+            background-color: #ff5500;
+        }
+
+        /* Footer styles */
+        .footer {
+            background-color: #8b8b8b;
+            color: rgb(8, 7, 7);
+            text-align: center;
+            padding: 10px;
+            bottom: 0;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .footer a {
+            color: rgb(5, 5, 4);
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
     <script>
-        // Ensure only admins who have signed up can access this page
         if (!localStorage.getItem('isAdmin')) {
             alert('You must sign up first!');
-            window.location.href = 'signup.html';  // Redirect to signup page
+            window.location.href = 'signup.html';  
         }
     </script>
+
+    <!-- Navbar -->
     <nav class="navbar">
         <div class="logo"><img src="assets/logo.png" alt="Food Logo"></div>
-        <h1 style="font-size: 30px;">Ritz Foods</h1>
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
-            <li><a href="about.html">About</a></li>
+            <li><a href="about.html">About Us</a></li>
             <li><a href="contact.html">Contact</a></li>
-    </ul>
+        </ul>
     </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Ritz Carlton</h2>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="admin.html">Admin</a></li>
+            <li><a href="viewproducts.html">Products</a></li>
+            <li><a href="vieworders.html">Orders</a></li>
+        </ul>
+    </div>
+
+    <!-- Admin Form -->
     <div class="admin-form">
         <form id="food-add-form" action="/admin" method="post" enctype="multipart/form-data">
-
             <h1>Add Food Item</h1>
-            
             <label for="food_name">Food Name:</label>
             <input type="text" id="food_name" name="food_name" placeholder="Enter food name" required>
 
@@ -55,20 +205,21 @@
             <button type="submit">Add Food Item</button>
         </form>
     </div>
-    <!-- Footer Section -->
-<footer class="footer">
-    <div class="footer-content">
-        <h2>Ritz Carlton</h2>
-        <div class="social-links">
-            <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <h2>Ritz Carlton</h2>
+            <div class="social-links">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            </div>
         </div>
-    </div>
-    <hr>
-    <p class="footer-rights">All rights are reserved © 2025</p>
-</footer>
+        <hr>
+        <p class="footer-rights">All rights reserved © 2025</p>
+    </footer>
 
     <script src="server.js"></script>
 </body>

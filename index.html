@@ -6,34 +6,177 @@
     <title>Home - Food Menu</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/fontawesome.min.css">
-<link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="css/all.min.css">
+    <style>
+        /* Navbar Styling */
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
+        .navbar .logo img {
+            height: 50px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .nav-links button {
+            background-color: #ff6600;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        .nav-links button:hover {
+            background-color: #ff5500;
+        }
+        .dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown .dropbtn {
+    text-decoration: none;
+    color: white;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    display: block;
+    font-size: 15px;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #555;
+}
+        /* Search Bar Section */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .search-container input {
+            padding: 10px;
+            width: 250px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .search-container button {
+            padding: 10px;
+            border: none;
+            background-color: #ff6600;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .search-container button i {
+            color: white;
+        }
+
+        /* Footer Styling */
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .footer .footer-content h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .footer .social-links {
+            margin-top: 10px;
+        }
+
+        .footer .social-links a {
+            color: white;
+            margin: 0 10px;
+            font-size: 18px;
+        }
+
+        .footer-rights {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #aaa;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo"><img src="assets/logo.png" alt="Food Logo"></div>
-        <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="contact.html">Contact</a></li>
+    <header>
+        <nav class="navbar">
+            <div class="logo"><img src="assets/logo.png" alt="Food Logo"></div>
+            <ul class="nav-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li>
+                    <select id="category-filter" onchange="filterFoodItems()">
+                        <option value="">Filter</option>
+                        <option value="starter">Starter</option>
+                        <option value="main-course">Main Course</option>
+                        <option value="dessert">Dessert</option>
+                        <option value="beverage">Beverage</option>
+                    </select>
+                </li>
+                <li><a href="login.html"><button type="button">Login</button></a></li>
+                <li><a href="admin.html"><button type="button">Admin</button></a></li>
+            </ul>
+        </nav>    
+    </header>
 
-        <!-- Search Bar -->
-        <input type="text" id="search-bar" placeholder="Search food..." oninput="filterFoodItems()" style="padding: 10px; width: 200px; margin: 10px;">
-
-        <!-- Category Filter -->
-        <select id="category-filter" onchange="filterFoodItems()">
-            <option value="">All Categories</option>
-            <option value="starter">Starter</option>
-            <option value="main-course">Main Course</option>
-            <option value="dessert">Dessert</option>
-            <option value="beverage">Beverage</option>
-        </select>
-
-        <a href="admin.html">
-            <button type="button">Admin</button>
-        </a>
-    </ul>
-    </nav>
+    <!-- Search Bar Section -->
+    <div class="search-container">
+        <input type="text" id="search-bar" placeholder="Search food..." oninput="filterFoodItems()">
+        <button type="button"><i class="fas fa-search"></i></button>
+    </div>
 
     <!-- Food Items Container -->
     <section class="food-container" id="food-container">
@@ -41,20 +184,19 @@
     </section>
 
     <!-- Footer Section -->
-<footer class="footer">
-    <div class="footer-content">
-        <h2>Ritz Carlton</h2>
-        <div class="social-links">
-            <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+    <footer class="footer">
+        <div class="footer-content">
+            <h2 style="color: white;">Ritz Carlton</h2>
+            <div class="social-links">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            </div>
         </div>
-    </div>
-    <hr>
-    <p class="footer-rights">All rights are reserved © 2025</p>
-</footer>
-
+        <hr>
+        <p class="footer-rights">All rights are reserved © 2025</p>
+    </footer>
 
     <!-- Link to script.js -->
     <script src="script.js"></script>

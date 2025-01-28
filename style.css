@@ -6,13 +6,14 @@ body {
     width: 60px;
     height: 60px;
     border-radius: 80%;
+    padding: 0 5px;
 }
 
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1rem;
+    padding: 0rem 0.5rem;
     background-color: #333;
     color: white;
 }
@@ -20,7 +21,7 @@ body {
 .nav-links {
     list-style: none;
     display: flex;
-    gap: 2rem;
+    gap: 1rem;
 }
 
 .nav-links a {

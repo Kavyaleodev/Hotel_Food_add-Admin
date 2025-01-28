@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Products</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* General styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #ff6600;
+            color: white;
+            padding: 10px 0px 0px 10px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 20px 30px;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+        }
+
+        /* Main content styles */
+        .main-content {
+            margin-left: 270px;
+            padding: 20px;
+        }
+
+        .main-content h2 {
+            font-size: 32px;
+            color: black;
+            margin-bottom: 20px;
+        }
+
+        .add-food-btn {
+            background-color: #ff6600;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .add-food-btn:hover {
+            background-color: #ff5500;
+        }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #ff6600;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Footer styles */
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            bottom: 0;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .footer a {
+            color: orange;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo"><img src="assets/logo.png" alt="Food Logo"></div>
+        <h1>Ritz Foods</h1>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Ritz Carlton</h2>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="viewproducts.html">Products</a></li>
+            <li><a href="vieworders.html">Orders</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h2>Product List</h2>
+        <button onclick="location.href='admin.html'" class="add-food-btn">Add Food</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="product-list">
+                <!-- Products will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <h2>Ritz Carlton</h2>
+            <div class="social-links">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+        <hr>
+        <p class="footer-rights">All rights reserved © 2025</p>
+    </footer>
+
+    <script>
+        async function fetchProducts() {
+            try {
+                const response = await fetch('/api/foods');
+                const products = await response.json();
+                const productList = document.getElementById('product-list');
+                productList.innerHTML = '';
+
+                products.forEach((product) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><img src="${product.image}" alt="${product.food_name}" style="width: 60px; height: 60px;"></td>
+                        <td>${product.food_name}</td>
+                        <td>${product.category}</td>
+                        <td>$${product.price.toFixed(2)}</td>
+                        <td>${product.description || 'N/A'}</td>
+                        <td>
+                            <button onclick="deleteProduct('${product._id}')">Delete</button>
+                            <button onclick="editProduct('${product._id}')">Edit</button>
+                        </td>
+                    `;
+                    productList.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        }
+
+        async function deleteProduct(productId) {
+            if (!confirm('Are you sure you want to delete this product?')) return;
+            try {
+                const response = await fetch(`/api/foods/${productId}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert('Product deleted successfully');
+                    fetchProducts();
+                } else {
+                    alert('Failed to delete product');
+                }
+            } catch (error) {
+                console.error('Error deleting product:', error);
+            }
+        }
+
+        async function editProduct(productId) {
+            window.location.href = `admin.html?edit=${productId}`;
+        }
+
+        // Fetch products on page load
+        fetchProducts();
+    </script>
+</body>
+</html>
