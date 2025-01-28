@@ -6,12 +6,11 @@
   <title>Register & Login</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="loginpage.css">
-  <script type="module" src="firebaseauth.js"></script>
 </head>
 <body>
   <div class="container" id="signup" style="display:none;">
     <h1 class="form-title">Register</h1>
-    <form>
+    <form id="signUpForm">
       <div id="signUpMessage" class="messageDiv" style="display:none;"></div>
       <div class="input-group">
         <i class="fas fa-user"></i>
@@ -36,14 +35,14 @@
       <button type="button" class="btn" id="submitSignUp">Sign Up</button>
     </form>
     <div class="links">
-      <p>Already Have Account?</p>
+      <p>Already Have an Account?</p>
       <button id="signInButton">Sign In</button>
     </div>
   </div>
 
   <div class="container" id="signIn">
     <h1 class="form-title">Sign In</h1>
-    <form>
+    <form id="signInForm">
       <div id="signInMessage" class="messageDiv" style="display:none;"></div>
       <div class="input-group">
         <i class="fas fa-envelope"></i>
@@ -62,11 +61,13 @@
       <button id="signUpButton">Sign Up</button>
     </div>
   </div>
+
   <script>
     const signUpButton = document.getElementById("signUpButton");
     const signInButton = document.getElementById("signInButton");
     const signInForm = document.getElementById("signIn");
     const signUpForm = document.getElementById("signup");
+    const users = [];  // Array to store user credentials
 
     signUpButton.addEventListener("click", () => {
       signInForm.style.display = "none";
@@ -76,6 +77,45 @@
     signInButton.addEventListener("click", () => {
       signUpForm.style.display = "none";
       signInForm.style.display = "block";
+    });
+
+    // Handle Signup
+    document.getElementById("submitSignUp").addEventListener("click", () => {
+      const firstName = document.getElementById("fName").value;
+      const lastName = document.getElementById("lName").value;
+      const email = document.getElementById("rEmail").value;
+      const password = document.getElementById("rPassword").value;
+      
+      // Store user details in the users array
+      users.push({ firstName, lastName, email, password });
+
+      alert("Registration successful!");
+      
+      // Switch to login form
+      signUpForm.style.display = "none";
+      signInForm.style.display = "block";
+    });
+
+    // Handle Login
+    document.getElementById("submitSignIn").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      // Find the user by email
+      const user = users.find(u => u.email === email);
+
+      if (!user) {
+        alert("User not found! Please sign up.");
+        return;
+      }
+
+      if (user.password === password) {
+        // Successful login
+        alert("Login successful! Redirecting...");
+        window.location.href = "index.html"; // Redirect to index page
+      } else {
+        alert("Invalid email or password. Please try again.");
+      }
     });
   </script>
 </body>

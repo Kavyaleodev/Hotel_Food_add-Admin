@@ -196,6 +196,27 @@ app.put("/api/foods/:id", upload.single("image"), async (req, res) => {
     res.status(500).send("Error updating food item.");
   }
 });
+// Handle contact form submissions (POST request)
+app.post("/contact", async (req, res) => {
+  try {
+    const { issue, full_name, email, mobile, message } = req.body;
+
+    // Save the contact form data to the database (or just log it)
+    const newContact = new Contact({
+      issue,
+      full_name,
+      email,
+      mobile,
+      message,
+    });
+
+    await newContact.save();
+    res.send("Your message has been submitted successfully! <a href='/contact'>Go back</a>");
+  } catch (err) {
+    console.error("Error saving contact message:", err);
+    res.status(500).send("Error submitting your message. Please try again later.");
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
