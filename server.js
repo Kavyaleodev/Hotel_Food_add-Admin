@@ -128,11 +128,39 @@ app.post("/admin", upload.single("image"), async (req, res) => {
   }
 });
 
-// Handle order form submissions
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
 app.post("/order", async (req, res) => {
   try {
-    const { food_name, quantity, customer_name, address, landmark, city, state, phone } = req.body;
+    const { food_name, quantity, price, customer_name, address, landmark, city, state, phone } = req.body;
+    
+    const totalAmount = price * quantity * 100; // Convert to cents
 
+    // Create Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: food_name,
+            },
+            unit_amount: price * 100, // Convert price to cents
+          },
+          quantity: quantity,
+        },
+      ],
+      mode: "payment",
+      success_url: `${process.env.BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.BASE_URL}/cancel`,
+      customer_email: req.body.email, // Optional: Collect customer's email for receipt
+      shipping_address_collection: {
+        allowed_countries: ["US", "IN"], // Add more if required
+      },
+    });
+
+    // Save the order in MongoDB with 'Pending' status before payment confirmation
     const newOrder = new Order({
       food_name,
       quantity,
@@ -142,12 +170,15 @@ app.post("/order", async (req, res) => {
       city,
       state,
       phone,
+      status: "Pending", // Payment confirmation pending
     });
 
     await newOrder.save();
-    res.send("Thank you for your order! <a href='/'>Go back</a>");
+
+    // Redirect user to Stripe checkout
+    res.redirect(session.url);
   } catch (err) {
-    console.error("Error saving order:", err);
+    console.error("Error processing order:", err);
     res.status(500).send("Error processing your order. Please try again later.");
   }
 });
@@ -216,6 +247,31 @@ app.post("/contact", async (req, res) => {
     console.error("Error saving contact message:", err);
     res.status(500).send("Error submitting your message. Please try again later.");
   }
+});
+app.get("/success", async (req, res) => {
+  try {
+    const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
+    
+    if (session.payment_status === "paid") {
+      await Order.findOneAndUpdate(
+        { customer_name: session.customer_details.name },
+        { status: "Paid" }
+      );
+    }
+
+    res.send("Payment Successful! Your order is confirmed.");
+  } catch (error) {
+    console.error("Error in payment success route:", error);
+    res.status(500).send("Error confirming payment.");
+  }
+});
+
+app.get("/success", (req, res) => {
+  res.sendFile(__dirname + "/success.html");
+});
+
+app.get("/cancel", (req, res) => {
+  res.sendFile(__dirname + "/cancel.html");
 });
 
 app.listen(port, () => {
