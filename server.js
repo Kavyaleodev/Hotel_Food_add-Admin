@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
+const Razorpay = require("razorpay");
 require("dotenv").config();
 
 const port = process.env.PORT || 3004;
@@ -64,25 +65,19 @@ const orderSchema = new mongoose.Schema({
 
 const Order = mongoose.model("orders", orderSchema);
 
-// Serve the homepage
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
+// Razorpay Instance
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// Serve the contact page
-app.get("/contact", (req, res) => {
-  res.sendFile(__dirname + "/contact.html");
-});
-
-// Serve the about page
-app.get("/about", (req, res) => {
-  res.sendFile(__dirname + "/about.html");
-});
-
-// Serve the view orders page
-app.get("/vieworders", (req, res) => {
-  res.sendFile(__dirname + "/vieworders.html");
-});
+// Serve pages
+app.get("/", (req, res) => res.sendFile(__dirname + "/index.html"));
+app.get("/contact", (req, res) => res.sendFile(__dirname + "/contact.html"));
+app.get("/about", (req, res) => res.sendFile(__dirname + "/about.html"));
+app.get("/payment/success", (req, res) => res.sendFile(__dirname + "/success.html"));
+app.get("/payment/cancel", (req, res) => res.sendFile(__dirname + "/cancel.html"));
+app.get("/vieworders", (req, res) => res.sendFile(__dirname + "/vieworders.html"));
 
 // API to get all food items
 app.get("/api/foods", async (req, res) => {
@@ -112,15 +107,9 @@ app.post("/admin", upload.single("image"), async (req, res) => {
     const { food_name, category, price, description } = req.body;
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
-    const newFood = new Food({
-      food_name,
-      category,
-      price,
-      description,
-      image: imageUrl,
-    });
-
+    const newFood = new Food({ food_name, category, price, description, image: imageUrl });
     await newFood.save();
+
     res.send("Food item added successfully! <a href='/'>Go back</a>");
   } catch (err) {
     console.error("Error saving food item:", err);
@@ -128,39 +117,21 @@ app.post("/admin", upload.single("image"), async (req, res) => {
   }
 });
 
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-
+// Handle order form submissions and create a Razorpay order
+// Handle order form submissions and create a Razorpay order
 app.post("/order", async (req, res) => {
   try {
     const { food_name, quantity, price, customer_name, address, landmark, city, state, phone } = req.body;
+    const totalAmount = price * quantity * 100; // Amount in paise
+
+    const options = {
+      amount: totalAmount, // Amount in paise
+      currency: "INR",
+      receipt: `order_rcptid_${Date.now()}`,
+    };
     
-    const totalAmount = price * quantity * 100; // Convert to cents
+    const order = await razorpay.orders.create(options);
 
-    // Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: food_name,
-            },
-            unit_amount: price * 100, // Convert price to cents
-          },
-          quantity: quantity,
-        },
-      ],
-      mode: "payment",
-      success_url: `${process.env.BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.BASE_URL}/cancel`,
-      customer_email: req.body.email, // Optional: Collect customer's email for receipt
-      shipping_address_collection: {
-        allowed_countries: ["US", "IN"], // Add more if required
-      },
-    });
-
-    // Save the order in MongoDB with 'Pending' status before payment confirmation
     const newOrder = new Order({
       food_name,
       quantity,
@@ -170,17 +141,51 @@ app.post("/order", async (req, res) => {
       city,
       state,
       phone,
-      status: "Pending", // Payment confirmation pending
+      status: "Pending",
     });
-
     await newOrder.save();
 
-    // Redirect user to Stripe checkout
-    res.redirect(session.url);
+    res.json({
+      orderId: order.id,
+      amount: totalAmount,
+      currency: "INR",
+      key: process.env.RAZORPAY_KEY_ID
+    });
   } catch (err) {
     console.error("Error processing order:", err);
     res.status(500).send("Error processing your order. Please try again later.");
   }
+});
+
+// Handle successful payment
+// Handle successful payment
+app.post("/payment/success", async (req, res) => {
+  try {
+    const { orderId, paymentId, signature } = req.body;
+
+    // Validate payment signature
+    const generatedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(orderId + "|" + paymentId)
+      .digest('hex');
+
+    if (generatedSignature === signature) {
+      // Update order status
+      await Order.findOneAndUpdate({ _id: orderId }, { status: "Paid" });
+
+      res.send("Payment Successful! Your order is confirmed.");
+    } else {
+      res.status(400).send("Payment validation failed");
+    }
+  } catch (error) {
+    console.error("Error confirming payment:", error);
+    res.status(500).send("Error confirming payment.");
+  }
+});
+
+// Handle payment failure
+app.post("/payment/failure", (req, res) => {
+  res.send("Payment failed. Please try again.");
 });
 
 // Serve static files for images
@@ -227,51 +232,17 @@ app.put("/api/foods/:id", upload.single("image"), async (req, res) => {
     res.status(500).send("Error updating food item.");
   }
 });
-// Handle contact form submissions (POST request)
 app.post("/contact", async (req, res) => {
   try {
     const { issue, full_name, email, mobile, message } = req.body;
-
-    // Save the contact form data to the database (or just log it)
-    const newContact = new Contact({
-      issue,
-      full_name,
-      email,
-      mobile,
-      message,
-    });
-
+    const newContact = new Contact({ issue, full_name, email, mobile, message });
     await newContact.save();
-    res.send("Your message has been submitted successfully! <a href='/contact'>Go back</a>");
+
+    res.send("Thank you for contacting us! We will get back to you shortly.");
   } catch (err) {
-    console.error("Error saving contact message:", err);
-    res.status(500).send("Error submitting your message. Please try again later.");
+    console.error("Error saving contact:", err);
+    res.status(500).send("Error submitting your contact request. Please try again later.");
   }
-});
-app.get("/success", async (req, res) => {
-  try {
-    const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
-    
-    if (session.payment_status === "paid") {
-      await Order.findOneAndUpdate(
-        { customer_name: session.customer_details.name },
-        { status: "Paid" }
-      );
-    }
-
-    res.send("Payment Successful! Your order is confirmed.");
-  } catch (error) {
-    console.error("Error in payment success route:", error);
-    res.status(500).send("Error confirming payment.");
-  }
-});
-
-app.get("/success", (req, res) => {
-  res.sendFile(__dirname + "/success.html");
-});
-
-app.get("/cancel", (req, res) => {
-  res.sendFile(__dirname + "/cancel.html");
 });
 
 app.listen(port, () => {

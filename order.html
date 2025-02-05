@@ -248,32 +248,101 @@
         <p class="footer-rights">All rights are reserved © 2025</p>
     </footer>
 
-    <script>
-        // Auto-fill the food name and price fields from the query parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const foodName = urlParams.get('foodName');
-        const price = parseFloat(urlParams.get('price'));
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    // Auto-fill the food name and price fields from the query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const foodName = urlParams.get('foodName');
+    const price = parseFloat(urlParams.get('price'));
 
-        if (foodName) {
-            document.getElementById('foodName').value = decodeURIComponent(foodName);
+    if (foodName) {
+        document.getElementById('foodName').value = decodeURIComponent(foodName);
+    }
+
+    if (!isNaN(price)) {
+        document.getElementById('price').value = price.toFixed(2);
+    }
+
+    // Calculate total price dynamically based on quantity
+    const quantityInput = document.getElementById('quantity');
+    const totalPriceInput = document.getElementById('totalPrice');
+
+    quantityInput.addEventListener('input', () => {
+        const quantity = parseInt(quantityInput.value, 10);
+        if (!isNaN(quantity) && quantity > 0) {
+            totalPriceInput.value = (price * quantity).toFixed(2);
+        } else {
+            totalPriceInput.value = "";
+        }
+    });
+
+    // Handle the payment gateway logic
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const quantity = document.getElementById('quantity').value;
+        const totalAmount = parseFloat(totalPriceInput.value) * 100; // Convert to paise
+
+        if (totalAmount <= 0) {
+            alert("Invalid total amount!");
+            return;
         }
 
-        if (!isNaN(price)) {
-            document.getElementById('price').value = price.toFixed(2);
-        }
+        // Call the backend to create an order and get Razorpay payment data
+        fetch('/order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                food_name: document.getElementById('foodName').value,
+                price: price,
+                quantity: quantity,
+                customer_name: document.getElementById('customerName').value,
+                address: document.getElementById('address').value,
+                landmark: document.getElementById('landmark').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+                phone: document.getElementById('phone').value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            var options = {
+                key: data.key, // Razorpay Key ID
+                amount: data.amount, // Total amount in paise
+                currency: data.currency,
+                name: "Ritz Foods",
+                description: "Food Order Payment",
+                order_id: data.orderId, // Order ID from Razorpay
+                handler: function (response) {
+                    // Payment successful, handle success
+                    alert("Payment Successful!");
+                    window.location.href = "/success.html"; // Redirect to success page
+                },
+                prefill: {
+                    name: document.getElementById('customerName').value,
+                    email: "test@example.com", // You can replace this with the actual email if available
+                    contact: document.getElementById('phone').value
+                },
+                notes: {
+                    address: document.getElementById('address').value
+                },
+                theme: {
+                    color: "#F57E1C"
+                }
+            };
 
-        // Calculate total price dynamically based on quantity
-        const quantityInput = document.getElementById('quantity');
-        const totalPriceInput = document.getElementById('totalPrice');
-
-        quantityInput.addEventListener('input', () => {
-            const quantity = parseInt(quantityInput.value, 10);
-            if (!isNaN(quantity) && quantity > 0) {
-                totalPriceInput.value = (price * quantity).toFixed(2);
-            } else {
-                totalPriceInput.value = "";
-            }
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        })
+        .catch(err => {
+            console.error("Error initiating payment", err);
+            alert("Error initiating payment. Please try again.");
         });
-    </script>
+    });
+</script>
+
 </body>
 </html>
