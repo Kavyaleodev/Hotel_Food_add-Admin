@@ -88,8 +88,8 @@ a button:hover {
 
 .food-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 2rem;
     padding: 2rem;
     background-color: #f9f9f9;
 }
@@ -203,6 +203,7 @@ form.css {
     height: auto;
     border-radius: 5px;
     margin-top: 10px;
+    margin-bottom: 10px;
 }
 /* Footer Styles */
 .footer {
